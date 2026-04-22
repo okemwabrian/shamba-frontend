@@ -19,7 +19,6 @@ const Dashboard = () => {
     notes: "",
   });
 
-  // ✅ Get user info
   const userRole = localStorage.getItem("role") || "Agent";
   const username = localStorage.getItem("username") || "";
 
@@ -49,7 +48,7 @@ const Dashboard = () => {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      window.location.reload(); // redirect to login
+      window.location.href = "/"; // ✅ FIXED redirect
     } else {
       fetchData();
     }
@@ -58,6 +57,7 @@ const Dashboard = () => {
   const openModal = (field) => {
     setSelectedField(field);
     setForm({ stage: field.current_stage, notes: "" });
+    setMenuOpen(false); // ✅ close sidebar on mobile
   };
 
   const closeModal = () => {
@@ -96,7 +96,6 @@ const Dashboard = () => {
             <FaLeaf /> SmartSeason
           </h2>
 
-          {/* ✅ UPDATED USER DISPLAY */}
           <p>
             <FaUser /> User: {userRole} {username && `(${username})`}
           </p>
@@ -106,12 +105,20 @@ const Dashboard = () => {
           className="logout-btn"
           onClick={() => {
             localStorage.clear();
-            window.location.reload();
+            window.location.href = "/";
           }}
         >
           <FaSignOutAlt /> Logout
         </button>
       </div>
+
+      {/* ✅ Overlay (NEW) */}
+      {menuOpen && (
+        <div
+          className="overlay"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
 
       {/* Main */}
       <div className="main-content">
@@ -120,7 +127,7 @@ const Dashboard = () => {
         <div className="top-bar">
           <button
             className="menu-btn"
-            onClick={() => setMenuOpen(!menuOpen)}
+            onClick={() => setMenuOpen(prev => !prev)}
           >
             <FaBars />
           </button>
@@ -157,7 +164,10 @@ const Dashboard = () => {
             <div className="charts">
               <div className="chart-box">
                 <h3>Field Status Overview</h3>
-                <ResponsiveContainer width="100%" height={250}>
+                <ResponsiveContainer
+                  width="100%"
+                  height={window.innerWidth < 768 ? 200 : 250}
+                >
                   <BarChart data={chartData}>
                     <XAxis dataKey="name" />
                     <YAxis />
@@ -169,7 +179,10 @@ const Dashboard = () => {
 
               <div className="chart-box">
                 <h3>Status Distribution</h3>
-                <ResponsiveContainer width="100%" height={250}>
+                <ResponsiveContainer
+                  width="100%"
+                  height={window.innerWidth < 768 ? 200 : 250}
+                >
                   <PieChart>
                     <Pie data={chartData} dataKey="value" outerRadius={80}>
                       {chartData.map((entry, index) => (
@@ -187,7 +200,7 @@ const Dashboard = () => {
             <div className="table-container">
               {fields.length === 0 ? (
                 <p style={{ textAlign: "center", padding: "20px" }}>
-                  No fields assigned yet 🌱
+                  No fields assigned yet
                 </p>
               ) : (
                 <table>

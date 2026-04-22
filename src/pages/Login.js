@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import API from "../services/api"; // ✅ FIXED (removed setAuthToken)
+import API from "../services/api";
 
 // Icons
-import { FaLeaf, FaUser, FaLock } from "react-icons/fa";
+import { FaLeaf, FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = ({ setIsAuthenticated }) => {
   const [form, setForm] = useState({
@@ -11,6 +11,7 @@ const Login = ({ setIsAuthenticated }) => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // 👁️ NEW
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -29,9 +30,6 @@ const Login = ({ setIsAuthenticated }) => {
       localStorage.setItem("role", res.data.role);
       localStorage.setItem("username", res.data.username);
 
-      // ❌ REMOVED setAuthToken (handled automatically)
-
-      // ✅ Authenticate user
       setIsAuthenticated(true);
     } catch (err) {
       alert("Invalid username or password");
@@ -62,12 +60,21 @@ const Login = ({ setIsAuthenticated }) => {
         {/* Password */}
         <div className="input-group">
           <FaLock className="input-icon" />
+
           <input
             name="password"
-            type="password"
+            type={showPassword ? "text" : "password"} // 👁️ TOGGLE
             placeholder="Password"
             onChange={handleChange}
           />
+
+          {/* 👁️ Eye Icon */}
+          <span
+            className="toggle-password"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
         </div>
 
         {/* Button */}
